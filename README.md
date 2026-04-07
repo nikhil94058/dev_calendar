@@ -3,8 +3,8 @@
 A highly polished, interactive React/Next.js calendar component built for high-performance individuals. Inspired by physical wall calendars, this component brings real-world aesthetics into the browser using advanced animations and modern UI/UX principles.
 
 ## 🚀 Live Demo & Video
-* **Live Deployment:** [Insert Vercel Link Here]
-* **Video Walkthrough:** [Insert Loom Link Here]
+* **Live Deployment:** [https://devcalendar-swart.vercel.app/]
+* **Video Walkthrough:** [https://www.youtube.com/watch?v=wFhn22BcnXg]
 
 ## ✨ Features
 * **Physical Aesthetic:** Features a simulated top-binding, dynamic monthly hero images, and a GSAP-powered swinging/hanging animation.
@@ -25,4 +25,4 @@ A highly polished, interactive React/Next.js calendar component built for high-p
 
 1. Clone the repository:
    ```bash
-   git clone [your-repo-link]
+   git clone https://github.com/nikhil94058/dev_calendar.git
