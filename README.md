@@ -14,7 +14,7 @@ A highly polished, interactive React/Next.js calendar component built for high-p
 ## 🚀 Live Demo & Video
 
 - 🌐 **Live Deployment:** [View the Calendar](https://devcalendar-swart.vercel.app/)
-- 🎥 **Video Walkthrough:** [Insert YouTube/Loom Link Here] 
+- 🎥 **Video Walkthrough:** [[YouTube](https://www.youtube.com/watch?v=wFhn22BcnXg&t=3s)] 
 
 ## ✨ Features
 
