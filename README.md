@@ -1,77 +1,163 @@
 # 🗓️ Interactive Wall Calendar Component
 
-[![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Framer Motion](https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer&logoColor=blue)](https://www.framer.com/motion/)
-[![GSAP](https://img.shields.io/badge/GSAP-88CE02?style=for-the-badge)](https://gsap.com/)
+A highly polished, interactive React/Next.js calendar component designed for high-performance individuals. Inspired by physical wall calendars, this project recreates real-world aesthetics in the browser using advanced animations, 3D effects, and modern UI/UX principles.
 
-A highly polished, interactive React/Next.js calendar component built for high-performance individuals. Inspired by physical wall calendars, this project brings real-world aesthetics into the browser using advanced animations, 3D effects, and modern UI/UX principles.
-
-<!-- 📸 Add a screenshot or GIF of your calendar here -->
-> **Note:** Add an image of your project here using `![Calendar Preview](link-to-your-image.png)` to make your README pop!
+---
 
 ## 🚀 Live Demo & Video
 
-- 🌐 **Live Deployment:** [View the Calendar](https://devcalendar-swart.vercel.app/)
-- 🎥 **Video Walkthrough:** [[YouTube](https://www.youtube.com/watch?v=wFhn22BcnXg&t=3s)] 
+* 🌐 **Live Demo:** [https://devcalendar-swart.vercel.app/](https://devcalendar-swart.vercel.app/)
+* 🎥 **Video Walkthrough:** [https://www.youtube.com/watch?v=wFhn22BcnXg](https://www.youtube.com/watch?v=wFhn22BcnXg)
+
+---
 
 ## ✨ Features
 
-- **📖 Physical Aesthetic:** Features a simulated top-binding, dynamic monthly hero images, and a GSAP-powered swinging/hanging animation to mimic a real wall calendar.
-- **🖱️ Smart Day Range Selector:** Interactive start-to-end date selection with smooth hover states and intuitive visual boundaries.
-- **📝 Persistent Notes & Habits:** Includes a monthly lined-paper note section, daily task scheduling, and a habit-tracking regimen (Exercise / Code / Meditate) utilizing dynamic SVG progress rings.
-- **📱 Fully Responsive:** Gracefully degrades from a stunning side-by-side desktop view to a touch-friendly, stacked mobile view.
-- **🌗 Dark/Light Mode:** Seamless, beautifully animated theme transitions.
-- **🪄 3D Page Flips:** Framer Motion powers realistic 3D page-turning animations when navigating between months.
-- **💾 Local Storage Sync:** 100% frontend-driven. All notes, events, moods, and habits are persisted locally in the browser—no database required.
+### 📖 Realistic Physical Design
+
+* Simulated top-binding and hanging effect
+* GSAP-powered swinging animation
+* Dynamic monthly hero visuals
+
+### 🖱️ Smart Date Selection
+
+* Smooth start-to-end range selection
+* Interactive hover states
+* Clean visual feedback
+
+### 📝 Productivity Tools
+
+* Monthly notes section (lined-paper UI)
+* Daily task scheduling
+* Habit tracking (Exercise / Code / Meditate)
+* Animated SVG progress rings
+
+### 📱 Fully Responsive
+
+* Desktop: immersive side-by-side layout
+* Mobile: clean, touch-friendly stacked UI
+
+### 🌗 Dark / Light Mode
+
+* Seamless theme switching
+* Smooth animated transitions
+
+### 🪄 Advanced Animations
+
+* 3D page flipping between months
+* Framer Motion powered interactions
+* GSAP + ScrollTrigger for depth & realism
+
+### 💾 Local Storage Persistence
+
+* 100% frontend-based
+* No backend required
+* Notes, tasks, and habits saved automatically
+
+---
 
 ## 🛠 Tech Stack
 
-- **Framework:** [Next.js](https://nextjs.org/) (React)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Animations:** 
-  - [Framer Motion](https://www.framer.com/motion/) (Page flips, UI states)
-  - [GSAP & ScrollTrigger](https://gsap.com/) (Physical swinging & parallax effects)
-- **Logic:** [date-fns](https://date-fns.org/) for complex calendar grid mathematics
+* **Framework:** Next.js (React)
+* **Styling:** Tailwind CSS
+* **Animations:**
 
-## 💻 How to Run Locally
+  * Framer Motion (UI + page transitions)
+  * GSAP + ScrollTrigger (physics & effects)
+* **Date Handling:** date-fns
 
-Follow these steps to get the calendar running on your local machine:
+---
 
-**1. Clone the repository:**
+## 📂 Project Structure (Simplified)
+
+```
+/components
+  └──  WallCalendar.tsx
+
+/app
+  ├── page.tsx
+  └── layout.tsx
+```
+
+---
+
+## ⚡ Getting Started
+
+### 1️⃣ Clone the Repository
+
 ```bash
 git clone https://github.com/nikhil94058/dev_calendar.git
-2. Navigate into the project directory:
-code
-Bash
 cd dev_calendar
-3. Install dependencies:
-code
-Bash
+```
+
+### 2️⃣ Install Dependencies
+
+```bash
 npm install
 # or
 yarn install
 # or
 pnpm install
-4. Start the development server:
-code
-Bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
+### 3️⃣ Run the Development Server
 
+```bash
+npm run dev
+```
 
+### 4️⃣ Open in Browser
 
+```
+http://localhost:3000
+```
 
-5. View the app:
-Open http://localhost:3000 in your browser to see the calendar in action.
-🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page if you want to contribute.
-📄 License
-This project is MIT licensed.
-Built with ❤️ by Nikhil
+---
+
+## 🎯 Use Cases
+
+* Personal productivity dashboards
+* Portfolio showcase projects
+* Habit tracking & self-improvement tools
+* UI/UX animation inspiration
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+* Fork the repo
+* Create a new branch
+* Submit a pull request
+
+You can also open issues for feature requests or improvements.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 💡 Author
+
+**Nikhil Das**
+
+* GitHub: [https://github.com/nikhil94058](https://github.com/nikhil94058)
+* Portfolio: *(add your link here)*
+
+---
+
+## ⭐ Support
+
+If you like this project:
+
+* ⭐ Star the repo
+* 🍴 Fork it
+* 📢 Share it
+
+---
+
+> Built with ❤️, precision, and a focus on beautiful user experience.
