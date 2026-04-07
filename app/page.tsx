@@ -1,52 +1,50 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import WallCalendar from "@/components/WallCalendar";
+import WallCalendar from "@/components/WallCalendar"; // Verify this path!
 import {
-  CalendarDays, MapPin, Sun, Activity, Sparkles, Command, ChevronRight,
-  Code, ExternalLink, Briefcase, GraduationCap, Star
+  CalendarDays, MapPin, Sparkles, Command,
+  Code, ExternalLink, Briefcase, GraduationCap, Star, ChevronDown
 } from "lucide-react";
-import { FiGithub, FiTwitter } from "react-icons/fi";
+import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { format } from "date-fns";
-import { motion } from "framer-motion";
-
+import { motion, Variants, useMotionValue, useTransform, useSpring } from "framer-motion";
 // --- GSAP IMPORTS ---
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-// Register GSAP ScrollTrigger
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// --- FRAMER MOTION VARIANTS ---
-const navVariants = {
+// --- FRAMER MOTION VARIANTS (Fixed for TypeScript) ---
+const navVariants: Variants = {
   hidden: { y: -30, opacity: 0 },
   show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 200, damping: 20 } }
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
 };
 
-const bentoItem = {
+const bentoItem: Variants = {
   hidden: { opacity: 0, y: 30, scale: 0.95, filter: "blur(10px)" },
   show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 250, damping: 25 } },
 };
 
-// ==========================================
-// MAIN COMPONENT
-// Responsible only for global state, layout, and global backgrounds
-// ==========================================
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const [userName, setUserName] = useState("User");
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const mainContainerRef = useRef<HTMLDivElement>(null);
 
+  // Safely handle client-side dates to prevent Next.js Hydration Errors during build
   useEffect(() => {
+    setMounted(true);
     setUserName("Nikhil");
+    setCurrentTime(new Date());
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
@@ -56,23 +54,13 @@ export default function Home() {
     gsap.to(".parallax-orb-1", {
       yPercent: 60,
       ease: "none",
-      scrollTrigger: {
-        trigger: mainContainerRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      },
+      scrollTrigger: { trigger: mainContainerRef.current, start: "top top", end: "bottom top", scrub: true },
     });
 
     gsap.to(".parallax-orb-2", {
       yPercent: -40,
       ease: "none",
-      scrollTrigger: {
-        trigger: mainContainerRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      },
+      scrollTrigger: { trigger: mainContainerRef.current, start: "top top", end: "bottom top", scrub: true },
     });
   }, { scope: mainContainerRef });
 
@@ -80,19 +68,27 @@ export default function Home() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Prevent UI flashing before hydration
+  if (!mounted) return <div className="min-h-screen bg-[#020617]" />;
+
   return (
-    <div ref={mainContainerRef} className="relative min-h-screen overflow-hidden selection:bg-sky-500/30 bg-[#020617] text-slate-200 font-sans">
-      <BackgroundElements />
-      <NavBar userName={userName} scrollToSection={scrollToSection} />
+    <div className="dark"> {/* Hardcoded to dark mode */}
+      <div 
+        ref={mainContainerRef} 
+        className="relative min-h-screen overflow-hidden selection:bg-sky-500/30 bg-[#020617] text-slate-200 font-sans"
+      >
+        <BackgroundElements />
+        <NavBar userName={userName} scrollToSection={scrollToSection} />
 
-      <main className="relative z-10 w-full flex flex-col items-center">
-        <DashboardHero userName={userName} currentTime={currentTime} scrollToSection={scrollToSection} />
-        <DailyChallenge />
-        <UseCases />
-        <CalendarSection />
-      </main>
+        <main className="relative z-10 w-full flex flex-col items-center">
+          <DashboardHero userName={userName} currentTime={currentTime} scrollToSection={scrollToSection} />
+          <DailyChallenge />
+          <UseCases />
+          <CalendarSection />
+        </main>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 }
@@ -116,7 +112,7 @@ function NavBar({ userName, scrollToSection }: { userName: string, scrollToSecti
     <motion.nav variants={navVariants} initial="hidden" animate="show" className="fixed top-0 w-full z-50 border-b border-white/[0.05] bg-[#020617]/70 backdrop-blur-2xl">
       <div className="max-w-[1200px] mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth'})}>
-          <div className="bg-gradient-to-tr from-sky-500 to-sky-300 p-2.5 rounded-2xl shadow-[0_0_20px_rgba(14,165,233,0.3)] text-slate-950 group-hover:scale-105 transition-all">
+          <div className="bg-gradient-to-tr from-sky-500 to-sky-400 p-2.5 rounded-2xl shadow-[0_0_20px_rgba(14,165,233,0.3)] text-white group-hover:scale-105 transition-all">
             <CalendarDays size={22} strokeWidth={2.5} />
           </div>
           <span className="font-bold text-xl tracking-tight text-white flex items-center gap-1">
@@ -131,7 +127,7 @@ function NavBar({ userName, scrollToSection }: { userName: string, scrollToSecti
           <button onClick={() => scrollToSection('calendar-section')} className="hover:text-white transition-colors">Calendar</button>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <div className="hidden lg:flex items-center gap-2 bg-white/[0.03] border border-white/[0.05] px-3 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:bg-white/[0.05] transition-colors cursor-text">
             <SearchIcon className="w-3.5 h-3.5" />
             <span>Search...</span>
@@ -139,12 +135,14 @@ function NavBar({ userName, scrollToSection }: { userName: string, scrollToSecti
               <Command size={10} /> K
             </div>
           </div>
+          
           <div className="w-px h-6 bg-white/[0.1] hidden sm:block"></div>
+          
           <div className="flex items-center gap-3 group cursor-pointer">
             <span className="text-sm font-medium text-slate-300 hidden sm:block group-hover:text-white transition-colors">{userName}</span>
             <div className="relative">
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 p-[2px] shadow-lg group-hover:scale-105 transition-transform duration-300">
-                <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-white font-bold text-sm">{userName.charAt(0)}</div>
+                <div className="w-full h-full rounded-full bg-[#020617] flex items-center justify-center text-white font-bold text-sm">{userName.charAt(0)}</div>
               </div>
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-[#020617] rounded-full"></div>
             </div>
@@ -155,13 +153,13 @@ function NavBar({ userName, scrollToSection }: { userName: string, scrollToSecti
   );
 }
 
-function DashboardHero({ userName, currentTime, scrollToSection }: { userName: string, currentTime: Date, scrollToSection: (id: string) => void }) {
+function DashboardHero({ userName, currentTime, scrollToSection }: { userName: string, currentTime: Date | null, scrollToSection: (id: string) => void }) {
   return (
     <section id="dashboard-section" className="w-full min-h-screen flex flex-col items-center justify-center pt-28 pb-20 px-4 sm:px-8 relative">
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-[1200px]">
         <motion.div variants={bentoItem} className="flex items-center gap-2.5 mb-8 ml-2">
           <div className="p-1.5 bg-sky-500/10 rounded-lg border border-sky-500/20"><Sparkles size={16} className="text-sky-400" /></div>
-          <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Dashboard Overview</h2>
+          <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Dashboard </h2>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -170,14 +168,14 @@ function DashboardHero({ userName, currentTime, scrollToSection }: { userName: s
             <div className="relative z-10">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-2">
                 <span className="text-white">Hi {userName},</span><br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-sky-100 to-white">Let's build something great.</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-sky-100 to-white">Let&apos;s build something great.</span>
               </h1>
               <p className="text-slate-400 font-medium mt-4 text-lg max-w-md">Your environment is synced. You have 2 pending reviews and your daily challenge is ready.</p>
             </div>
             <div className="mt-12 flex gap-4 relative z-10">
               <div className="flex items-center gap-3 bg-white/[0.05] text-white px-6 py-3 rounded-2xl text-sm font-semibold border border-white/[0.1] backdrop-blur-md">
                 <CalendarDays size={18} className="text-sky-400" />
-                <span>{format(currentTime, 'EEEE, MMMM do • h:mm a')}</span>
+                <span>{currentTime ? format(currentTime, 'EEEE, MMMM do • h:mm a') : "Loading time..."}</span>
               </div>
             </div>
           </motion.div>
@@ -190,8 +188,8 @@ function DashboardHero({ userName, currentTime, scrollToSection }: { userName: s
                 <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded-md">Top 5%</span>
               </div>
               <div className="relative z-10">
-                <p className="text-3xl font-black text-white leading-none">kumarnikhil94058</p>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500 mt-2">LeetCode Profile</p>
+                <p className="text-3xl font-black text-white leading-none">Expert</p>
+                <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500 mt-2">Codeforces Rating</p>
               </div>
             </motion.div>
 
@@ -207,6 +205,16 @@ function DashboardHero({ userName, currentTime, scrollToSection }: { userName: s
               </div>
             </motion.div>
           </div>
+          {/* SCROLL DOWN INDICATOR */}
+      <motion.div 
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer text-slate-500 hover:text-sky-400 transition-colors flex flex-col items-center gap-2"
+        animate={{ y: [0, 10, 0] }}
+        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+        onClick={() => scrollToSection('daily-challenge')}
+      >
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Scroll</span>
+        <ChevronDown size={20} strokeWidth={2.5} />
+      </motion.div>
         </div>
       </motion.div>
     </section>
@@ -236,10 +244,10 @@ function DailyChallenge() {
           <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4 flex items-center justify-center gap-3">
             <Code className="text-sky-400" size={40} /> Daily Challenge
           </h2>
-          <p className="text-slate-400 font-medium max-w-xl mx-auto">Sharpen your algorithms. Solve today's featured problem curated for High-Rating competitors.</p>
+          <p className="text-slate-400 font-medium max-w-xl mx-auto">Sharpen your algorithms. Solve today&apos;s featured problem curated for High-Rating competitors.</p>
         </div>
 
-        <div className="bg-[#0b1121] border border-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+        <div className="bg-[#0b1121] border border-slate-800 rounded-3xl p-8 sm:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-10 bg-slate-900 border-b border-slate-800 flex items-center px-4 gap-2">
             <div className="w-3 h-3 rounded-full bg-rose-500"></div>
             <div className="w-3 h-3 rounded-full bg-amber-500"></div>
@@ -276,7 +284,6 @@ function DailyChallenge() {
 function UseCases() {
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Encapsulated GSAP logic specifically for this component
   useGSAP(() => {
     gsap.from(".use-case-card", {
       y: 80,
@@ -284,10 +291,7 @@ function UseCases() {
       duration: 0.8,
       stagger: 0.15,
       ease: "power3.out",
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 75%",
-      }
+      scrollTrigger: { trigger: sectionRef.current, start: "top 75%" }
     });
   }, { scope: sectionRef });
 
@@ -296,7 +300,7 @@ function UseCases() {
       <div className="max-w-[1200px] mx-auto">
         <div className="mb-12">
           <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">Built for Performers.</h2>
-          <p className="text-slate-400 font-medium">Whether you're writing code or managing teams, Calenflow adapts.</p>
+          <p className="text-slate-400 font-medium">Whether you&apos;re writing code or managing teams, Calenflow adapts.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -324,22 +328,61 @@ function UseCases() {
 }
 
 function CalendarSection() {
+  // 1. Motion value to track the horizontal drag distance
+  const x = useMotionValue(0);
+  
+  // 2. Map the horizontal movement to a rotation angle (-15 deg to 15 deg)
+  const rawRotation = useTransform(x, [-300, 300], [-15, 15]);
+  
+  // 3. Add spring physics so it swings naturally and settles smoothly
+  const rotation = useSpring(rawRotation, { stiffness: 150, damping: 12 });
+
   return (
-    <section id="calendar-section" className="w-full min-h-screen flex items-center justify-center py-24 px-4 sm:px-8 relative z-10 border-t border-white/[0.05]">
+    <section id="calendar-section" className="w-full min-h-screen flex items-center justify-center pt-16 pb-24 px-4 sm:px-8 relative z-10 border-t border-white/[0.05]">
       <div className="w-full max-w-[1200px] flex flex-col items-center">
-        <div className="w-full flex items-end justify-between mb-10 px-2 sm:px-6">
+        
+        <div className="w-full flex items-end justify-between mb-8 px-2 sm:px-6">
           <div>
             <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">My Calendar</h2>
             <p className="text-slate-400 font-medium text-base">Manage your schedule, upcoming events, and daily notes.</p>
           </div>
           <div className="hidden sm:flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-slate-400"><div className="w-2 h-2 rounded-full bg-sky-400"></div> Events</div>
+            <div className="flex items-center gap-2 text-sm text-slate-400"><div className="w-2 h-2 rounded-full bg-sky-500"></div> Events</div>
             <div className="flex items-center gap-2 text-sm text-slate-400"><div className="w-2 h-2 rounded-full bg-amber-500"></div> Contests</div>
           </div>
         </div>
-        <div className="w-full relative bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] p-2 sm:p-8 rounded-[2.5rem] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-          <WallCalendar />
-        </div>
+
+        {/* INTERACTIVE HANGING CALENDAR WRAPPER */}
+        <motion.div 
+          drag="x" // Allow horizontal drag
+          dragConstraints={{ left: 0, right: 0 }} // Force it to snap back to center
+          dragElastic={0.4} // Give it some resistance as it's pulled
+          style={{ x, rotate: rotation, transformOrigin: "top center", perspective: "1000px" }}
+          className="w-full relative flex flex-col items-center mt-12 cursor-grab active:cursor-grabbing touch-none"
+        >
+          
+          {/* Strings & Nails */}
+          <div className="absolute -top-16 left-1/4 sm:left-[20%] w-0.5 h-20 bg-gradient-to-b from-white/30 to-white/10 z-0 origin-top rotate-[15deg] pointer-events-none">
+            <div className="absolute -top-2 -left-[5px] w-3 h-3 rounded-full bg-slate-600 shadow-[0_2px_4px_rgba(0,0,0,0.5)] border border-slate-500"></div>
+            <div className="absolute -top-1 -left-[2px] w-1 h-1 rounded-full bg-white/50"></div>
+          </div>
+
+          <div className="absolute -top-16 right-1/4 sm:right-[20%] w-0.5 h-20 bg-gradient-to-b from-white/30 to-white/10 z-0 origin-top -rotate-[15deg] pointer-events-none">
+            <div className="absolute -top-2 -left-[5px] w-3 h-3 rounded-full bg-slate-600 shadow-[0_2px_4px_rgba(0,0,0,0.5)] border border-slate-500"></div>
+            <div className="absolute -top-1 -left-[2px] w-1 h-1 rounded-full bg-white/50"></div>
+          </div>
+
+          <div className="w-full relative z-10 bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] p-2 sm:p-8 rounded-[2.5rem] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_30px_60px_rgba(0,0,0,0.5)]">
+            {/* Stop propagation inside the calendar so interacting 
+              with calendar buttons doesn't trigger a drag 
+            */}
+            <div onPointerDownCapture={(e) => e.stopPropagation()} className="cursor-auto">
+              <WallCalendar />
+            </div>
+          </div>
+
+        </motion.div>
+
       </div>
     </section>
   );
@@ -359,8 +402,8 @@ function Footer() {
 
         <div className="flex flex-col items-center md:items-end text-center md:text-right">
           <div className="flex gap-4 mb-4">
-            <a href="#" className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.1] transition-all"><FiGithub size={18} /></a>
-            <a href="#" className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-slate-400 hover:text-white hover:bg-sky-500/20 hover:border-sky-500/30 transition-all"><FiTwitter size={18} /></a>
+            <a href="https://github.com/nikhil94058" className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.1] transition-all"><FiGithub size={18} /></a>
+            <a href="https://www.linkedin.com/in/nikhil94058/" className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-slate-400 hover:text-white hover:bg-sky-500/20 hover:border-sky-500/30 transition-all"><FiLinkedin size={18} /></a>
           </div>
           <div className="bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-amber-500/20 px-4 py-2 rounded-lg inline-flex items-center gap-2">
             <Star size={14} className="text-amber-400" fill="currentColor" />

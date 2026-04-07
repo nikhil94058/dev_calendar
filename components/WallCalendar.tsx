@@ -6,7 +6,7 @@ import {
   eachDayOfInterval, isSameMonth, isSameDay, isWithinInterval,
   isBefore, startOfWeek, endOfWeek, subDays
 } from "date-fns";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, Plus, Flame, Activity, Book, Sun, Moon, Calendar as CalendarIcon, Trophy, Code2, Sparkles, Coffee, Target, Swords, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +51,7 @@ const SPECIAL_DAYS: Record<string, { label: string, icon: React.ReactNode }> = {
   "12-31": { label: "Commit Year", icon: <Coffee size={10} className="text-rose-400" /> }
 };
 
-const flipVariants = {
+const flipVariants : Variants = {
   enter: (direction: number) => ({ rotateX: direction > 0 ? -90 : 90, y: direction > 0 ? 50 : -50, opacity: 0, filter: "blur(8px)", zIndex: 10 }),
   center: { rotateX: 0, y: 0, opacity: 1, filter: "blur(0px)", zIndex: 10, transition: { duration: 0.7, type: "spring", bounce: 0.3 } },
   exit: (direction: number) => ({ rotateX: direction < 0 ? -90 : 90, y: direction < 0 ? 50 : -50, opacity: 0, filter: "blur(8px)", zIndex: 0, transition: { duration: 0.4 } }),
