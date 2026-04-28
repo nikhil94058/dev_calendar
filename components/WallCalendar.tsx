@@ -59,6 +59,15 @@ const flipVariants : Variants = {
 
 const MOODS = ["🤩", "😊", "😐", "😔", "😫"];
 
+// Type for Contests
+interface ContestEvent {
+  date: string;
+  name: string;
+  time: string;
+  color: string;
+  bg: string;
+}
+
 export default function WallCalendar() {
   const [[currentDate, direction], setDateTuple] = useState([new Date(), 0]);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -76,22 +85,102 @@ export default function WallCalendar() {
   
   // API State
   const [cfData, setCfData] = useState<{ rating: number, rank: string } | null>(null);
+  const [liveCfContests, setLiveCfContests] = useState<any[]>([]);
   const [cfHandle] = useState("tourist");
 
   const calendarContainerRef = useRef<HTMLDivElement>(null);
   const monthIndex = currentDate.getMonth();
 
-  // Generate mock contests for the current viewing month
+  // 1. Fetch Global Live Contests on mount
+  useEffect(() => {
+    const fetchCFContests = async () => {
+      try {
+        const res = await fetch("https://codeforces.com/api/contest.list?gym=false");
+        const data = await res.json();
+        if (data.status === "OK") {
+          // Filter for upcoming contests only
+          const upcoming = data.result.filter((c: any) => c.phase === "BEFORE");
+          setLiveCfContests(upcoming);
+        }
+      } catch (err) {
+        console.error("Failed to fetch CF contests");
+      }
+    };
+    fetchCFContests();
+  }, []);
+
+  // 2. Generate Real + Predictable Contests for the current viewing month
   const currentMonthContests = useMemo(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    return [
-      { date: format(new Date(year, month, 4), "yyyy-MM-dd"), name: "Codeforces Round (Div. 2)", time: "10:35", color: "text-rose-500", bg: "bg-rose-500" },
-      { date: format(new Date(year, month, 11), "yyyy-MM-dd"), name: "LeetCode Weekly", time: "10:30", color: "text-amber-500", bg: "bg-amber-500" },
-      { date: format(new Date(year, month, 18), "yyyy-MM-dd"), name: "Educational CF Round", time: "10:35", color: "text-rose-500", bg: "bg-rose-500" },
-      { date: format(new Date(year, month, 26), "yyyy-MM-dd"), name: "AtCoder Beginner", time: "08:00", color: "text-cyan-500", bg: "bg-cyan-500" }
-    ];
-  }, [currentDate]);
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(monthStart);
+    const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    
+    const contests: ContestEvent[] = [];
+
+    // --- A. Codeforces API Contests ---
+    liveCfContests.forEach(c => {
+      const date = new Date(c.startTimeSeconds * 1000);
+      if (isSameMonth(date, currentDate)) {
+        contests.push({
+          date: format(date, "yyyy-MM-dd"),
+          name: c.name,
+          time: format(date, "HH:mm"),
+          color: "text-rose-500",
+          bg: "bg-rose-500"
+        });
+      }
+    });
+
+    // --- B. Mathematically Predictable Contests ---
+    // Reference date for Biweekly parity: March 2, 2024 (Biweekly 125)
+    const knownBiweekly = new Date(2024, 2, 2); 
+    const knownUTCTimestamp = Date.UTC(knownBiweekly.getFullYear(), knownBiweekly.getMonth(), knownBiweekly.getDate());
+
+    daysInMonth.forEach(day => {
+      const dateStr = format(day, "yyyy-MM-dd");
+      const dayUTCTimestamp = Date.UTC(day.getFullYear(), day.getMonth(), day.getDate());
+      const diffDays = Math.round((dayUTCTimestamp - knownUTCTimestamp) / (1000 * 60 * 60 * 24));
+
+      // Sunday: LeetCode Weekly
+      if (day.getDay() === 0) {
+        contests.push({
+          date: dateStr,
+          name: "LeetCode Weekly",
+          time: "02:30",
+          color: "text-amber-500",
+          bg: "bg-amber-500"
+        });
+      }
+
+      // Saturday: AtCoder Beginner & LeetCode Biweekly
+      if (day.getDay() === 6) {
+        contests.push({
+          date: dateStr,
+          name: "AtCoder Beginner",
+          time: "12:00",
+          color: "text-cyan-500",
+          bg: "bg-cyan-500"
+        });
+
+        if (diffDays % 14 === 0) {
+          contests.push({
+            date: dateStr,
+            name: "LeetCode Biweekly",
+            time: "14:30",
+            color: "text-amber-400",
+            bg: "bg-amber-400"
+          });
+        }
+      }
+    });
+
+    // Sort chronologically
+    return contests.sort((a, b) => {
+      const dateA = new Date(`${a.date}T${a.time}:00`);
+      const dateB = new Date(`${b.date}T${b.time}:00`);
+      return dateA.getTime() - dateB.getTime();
+    });
+  }, [currentDate, liveCfContests]);
 
   useEffect(() => {
     const monthKey = format(currentDate, "yyyy-MM");
@@ -108,7 +197,7 @@ export default function WallCalendar() {
           setCfData({ rating: data.result[0].rating, rank: data.result[0].rank });
         }
       } catch (err) {
-        console.error("Failed to fetch CF data");
+        console.error("Failed to fetch CF user data");
       }
     };
     fetchCF();
@@ -225,15 +314,15 @@ export default function WallCalendar() {
         </div>
 
         {/* RIGHT SIDEBAR: CONTEST SHOWCASE (Visible on xl screens and up) */}
-        <div className="hidden xl:flex absolute top-20 -right-72 w-64 bg-white/60 dark:bg-[#020617]/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-2xl p-5 flex-col shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-40">
-          <h3 className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-white/10 pb-3">
+        <div className="hidden xl:flex absolute top-20 -right-72 w-64 bg-white/60 dark:bg-[#020617]/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-2xl p-5 flex-col shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-40 max-h-[600px] overflow-hidden">
+          <h3 className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-white/10 pb-3 shrink-0">
             <Swords size={16} className="text-indigo-500"/> Upcoming Contests
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-2 pb-2">
             {currentMonthContests.map((contest, i) => (
               <motion.div 
-                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 * i }}
-                key={i} className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 p-3 rounded-xl flex flex-col gap-1 relative overflow-hidden group hover:border-gray-300 dark:hover:border-white/20 transition-colors"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 * i }}
+                key={i} className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 p-3 rounded-xl flex flex-col gap-1 relative overflow-hidden group hover:border-gray-300 dark:hover:border-white/20 transition-colors shrink-0"
               >
                 <div className={`absolute top-0 left-0 w-1 h-full ${contest.bg}`} />
                 <span className={`text-[10px] font-bold uppercase tracking-wider ${contest.color}`}>
@@ -243,10 +332,13 @@ export default function WallCalendar() {
                   {contest.name}
                 </span>
                 <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-500 dark:text-slate-400 font-medium">
-                  <Clock size={10} /> {contest.time}
+                  <Clock size={10} /> {contest.time} UTC
                 </div>
               </motion.div>
             ))}
+            {currentMonthContests.length === 0 && (
+              <p className="text-xs text-slate-500 text-center py-4">No contests planned this month.</p>
+            )}
           </div>
         </div>
 
@@ -431,7 +523,8 @@ export default function WallCalendar() {
                     const progress = getHabitProgress(dKey);
                     const isPopupOpen = emojiPopupOpen === dKey;
                     
-                    const contestOnDay = currentMonthContests.find(c => c.date === dKey);
+                    // Allow multiple dots per day
+                    const contestsOnDay = currentMonthContests.filter(c => c.date === dKey);
                     
                     const isHoverRange = startDate && !endDate && hoverDate && isWithinInterval(day, {
                         start: isBefore(hoverDate, startDate) ? hoverDate : startDate,
@@ -470,12 +563,16 @@ export default function WallCalendar() {
                           {format(day, "d")}
                         </motion.button>
 
-                        {/* Event Badges, Contest Dot & Emoji Trigger Area */}
+                        {/* Event Badges, Contest Dots & Emoji Trigger Area */}
                         <div className="flex gap-1 mt-1 z-20 items-center justify-center h-3 sm:h-4 relative w-full">
                           
-                          {/* Contest Dot */}
-                          {contestOnDay && (
-                             <div title={contestOnDay.name} className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${contestOnDay.bg} shadow-md pointer-events-auto`}></div>
+                          {/* Dynamic Contest Dots (Maps up to 3 dots horizontally) */}
+                          {contestsOnDay.length > 0 && (
+                             <div className="flex gap-[3px] pointer-events-auto">
+                               {contestsOnDay.slice(0, 3).map((contest, idx) => (
+                                 <div key={idx} title={contest.name} className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${contest.bg} shadow-md`}></div>
+                               ))}
+                             </div>
                           )}
 
                           {specialDay && (
@@ -493,7 +590,8 @@ export default function WallCalendar() {
                             {mood || <span className="opacity-0 group-hover:opacity-40 text-gray-400 dark:text-slate-500 text-[10px]">☻</span>}
                           </button>
 
-                          {hasEvents && !mood && !contestOnDay && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)] pointer-events-none"></div>}
+                          {/* Fallback event dot if no contest dots are taking up space */}
+                          {hasEvents && !mood && contestsOnDay.length === 0 && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)] pointer-events-none"></div>}
 
                           {/* INLINE EMOJI POP-UP - 3D Styled emojis */}
                           <AnimatePresence>
