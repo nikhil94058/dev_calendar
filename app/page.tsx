@@ -52,7 +52,7 @@ const bentoItem: Variants = {
 // --- HELPER: GET NEXT SPECIFIC DAY & TIME (UTC) ---
 function getNextOccurrenceUTC(dayOfWeek: number, hourUTC: number, minuteUTC: number): number {
   const now = new Date();
-  let nextDate = nextDay(now, dayOfWeek as Day); // 0=Sun, 6=Sat
+let nextDate = nextDay(now, dayOfWeek as 0 | 1 | 2 | 3 | 4 | 5 | 6);
   
   // Adjust to UTC
   nextDate.setUTCHours(hourUTC, minuteUTC, 0, 0);
